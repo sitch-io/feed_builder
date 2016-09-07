@@ -26,7 +26,7 @@ class TestWriteFromFixtures:
         return comparator
 
     def outfile_handler_create(self, columns):
-        of_handler = sitchlib.OutfileHandler(temp_path, columns)
+        of_handler = sitchlib.FccOutfileHandler(temp_path, columns)
         return of_handler
 
     def test_run_complete(self):

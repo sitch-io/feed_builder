@@ -7,7 +7,10 @@ class ArfcnComparator(object):
     instantiation.  You'll use these as the reference input for the
     class method get_arfcn_list_by_range.  We are currently only building for
     GSM850 and PCS1900.  To add bands, improve on reference_list components
-    below. """
+    below.
+
+    """
+
     def __init__(self):
         self.reference_list = arfcn_ref.gsm_850 + arfcn_ref.pcs_1900
         self.uplink_to_arfcn = self.get_up_to_arfcn()

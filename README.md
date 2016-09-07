@@ -1,4 +1,4 @@
-# Sitch feed v2
+# Sitch feed v3
 # Another stab at vetting the GSM network around us
 
 Given that cell phone companies are perfectly entitled to mess with their own
