@@ -1,5 +1,5 @@
-# Sitch feed v3
-# Another stab at vetting the GSM network around us
+# Sitch feed builder
+## Another stab at verifying the GSM network around us
 
 Given that cell phone companies are perfectly entitled to mess with their own
 internal addressing, things like LAC and CID should be expected to change.
@@ -20,3 +20,38 @@ allowed to transmit on.  So we do a match based on geolocation and ARFCN, then
 compare the HNI to the licensee to determine whether or not a BTS is evil.
 
 This is intended to support the SITCH sensor Mk III.
+
+
+## What it does
+
+This tool runs in a Docker container and requires the following environment
+variables to be passed in:
+
+| Variable Name  | Purpose                      |
+|----------------|------------------------------|
+| OCID_KEY       | OpenCellID API key           |
+| TWILIO_SID     | Twilio SID, for API access   |
+| TWILIO_TOKEN   | Twilio token, for API access |
+
+You should also mount your web root directory into the container's filesystem
+at ```/var/production/```.  This will ensure that when the container dies, it
+will leave behind your feed files to be served by your web server.  Make sure
+you remove the container after it's run, or you kick the job off with --rm in
+the arguments for ```docker run```.  If not, you'll quickly subscribe the disk in your instance running the Docker engine.  This takes quite a bit to run.  See below for details.
+
+Build it like this: ```docker build -t sitchfeed .```
+To recap, this is how you should kick it off, and treat it like a daily cron
+job:
+
+    docker run -it --rm \
+       -e OCID_KEY=$OCID_KEY \
+       -e TWILIO_SID=$TWILIO_SID \
+       -e TWILIO_TOKEN=$TWILIO_TOKEN \
+       -v /var/www/:/var/production/ \
+       sitchfeed
+
+While the Docker image itself is a humble <64MB, the running container
+can use beyond 12.5GB of disk storage and nearly 2GB of RAM as it creates the
+feed files.  It seems less than ideal, but without this process the individual
+download size of the intel feed would be multiple gigabytes per sensor, per
+feed refresh.  This is an unfortunate but necessary evil.

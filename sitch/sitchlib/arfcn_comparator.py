@@ -48,8 +48,13 @@ class ArfcnComparator(object):
         """ The reference var should look like this:
         {frequency: arfcn, frequency: arfcn} """
         arfcn_list = []
-        starting = float(start)
-        ending = float(end)
+        try:
+            starting = float(start)
+            ending = float(end)
+        except ValueError:
+            print "Unable to set float from %s and %s" % (str(start), str(end))
+            starting = float(0)
+            ending = float(1)
         for freq in reference.items():
             target = float(freq[0])
             if starting < target < ending:

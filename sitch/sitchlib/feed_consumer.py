@@ -1,10 +1,11 @@
 import gzip
 import os
 import requests
+import shutil
 from zipfile import ZipFile
 
 
-class FeedCollector(object):
+class FeedConsumer(object):
     """This class handles obtaining the feed files from OpenCellID and the FCC.
 
     Only one argument, and that's an object that contains the runtime
@@ -25,6 +26,7 @@ class FeedCollector(object):
         self.fcc_url = "%s%s" % (self.fcc_feed_base, self.fcc_feed_file)
         self.fcc_outfile = config.fcc_destination_file
         self.fcc_tempfile = "%s%s" % (self.fcc_outfile, "tempfile")
+        self.fcc_enclosed_file = config.fcc_enclosed_file
 
     def write_ocid_feed_file(self):
         """ Calling this method will cause the retrieval of the
@@ -40,10 +42,7 @@ class FeedCollector(object):
 
     def write_fcc_feed_file(self):
         """ Calling this method will result in the retrieval of the
-        FCC license database.
-
-        """
-
+        FCC license database. """
         response = requests.get(self.fcc_url, stream=True)
         print "Downloading FCC license database.  This will take a while."
         with open(self.fcc_tempfile, 'wb') as feed_temp_file:
@@ -51,8 +50,12 @@ class FeedCollector(object):
                 if chunk:
                     feed_temp_file.write(chunk)
         print "Converting FCC license from zip to gzip"
-        with ZipFile.open(self.fcc_tempfile, 'wb') as src_file:
-            with gzip.open(self.fcc_outfile, 'wb') as dest_file:
-                dest_file.write(src_file.read())
+        with ZipFile(self.fcc_tempfile, 'r') as src_file:
+            src_file.extract(self.fcc_enclosed_file, "/var/")
         os.remove(self.fcc_tempfile)
+        raw_fcc_file = "/var/%s" % self.fcc_enclosed_file
+        with open(raw_fcc_file, 'rb') as file_in:
+            with gzip.open(self.fcc_outfile, 'wb') as dest_file:
+                shutil.copyfileobj(file_in, dest_file)
+        os.remove(raw_fcc_file)
         print "FCC license database written to %s" % self.fcc_outfile

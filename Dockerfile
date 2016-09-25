@@ -1,11 +1,12 @@
-FROM ubuntu:16.04
+FROM alpine:3.4
 MAINTAINER ash.d.wilson@gmail.com
 
-RUN apt-get update && \
-    apt-get -y upgrade && \
-    apt-get install -y \
-    python \
-    python-pip
+RUN apk update && \
+    apk add \
+    python
+
+ADD https://bootstrap.pypa.io/get-pip.py /
+RUN python /get-pip.py
 
 RUN pip install \
     requests \
@@ -13,5 +14,7 @@ RUN pip install \
 
 COPY sitch/ /app/sitch
 
+
 WORKDIR /app/sitch
+
 CMD ["/usr/bin/python", "/app/sitch/runner.py"]
