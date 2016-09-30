@@ -77,7 +77,9 @@ def main():
             fileout.write_fcc_record(net_row)
     print "Compressing FCC feed files"
     compress_and_remove_original(fileout.feed_files)
-    fileout.feedfiles = []
+    fileout = None
+    fileout = sitchlib.OutfileHandler(config.base_path,
+                                      fcc_fields, ocid_fields)
     print "Downloading feed from OpenCellID"
     feed_manager.write_ocid_feed_file()
     ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
