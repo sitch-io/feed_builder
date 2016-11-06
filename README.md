@@ -47,7 +47,7 @@ job:
        -e OCID_KEY=$OCID_KEY \
        -e TWILIO_SID=$TWILIO_SID \
        -e TWILIO_TOKEN=$TWILIO_TOKEN \
-       -v /var/www/:/var/production/ \
+       -v /opt/share/www/:/var/production/ \
        sitchfeed
 
 While the Docker image itself is a humble <64MB, the running container
