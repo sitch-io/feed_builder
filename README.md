@@ -37,7 +37,9 @@ You should also mount your web root directory into the container's filesystem
 at ```/var/production/```.  This will ensure that when the container dies, it
 will leave behind your feed files to be served by your web server.  Make sure
 you remove the container after it's run, or you kick the job off with --rm in
-the arguments for ```docker run```.  If not, you'll quickly subscribe the disk in your instance running the Docker engine.  This takes quite a while to run.  See below for details.
+the arguments for ```docker run```.  If not, you'll quickly subscribe the disk
+in your instance running the Docker engine.  This takes quite a while to run.  
+See below for details.
 
 This is how you should kick it off, and treat it like a daily cron
 job:
@@ -46,14 +48,12 @@ job:
        -e OCID_KEY=$OCID_KEY \
        -e TWILIO_SID=$TWILIO_SID \
        -e TWILIO_TOKEN=$TWILIO_TOKEN \
-       -v /opt/shared/www/:/var/production/ \
-       -v /opt/shared/feed_temp:/var/feed/
+       -v /opt/shared/feed:/var/ \
        docker.io/sitch/feed_builder
 
 While the Docker image itself is a humble <64MB, the running container
 can use beyond 12.5GB of disk storage and nearly 2GB of RAM as it creates the
 feed files.  It seems less than ideal, but without this process the individual
 download size of the intel feed would be multiple gigabytes per sensor, per
-feed refresh.  This is an unfortunate but necessary evil.  The second mounted
-volume above, to /opt/shared/feed_temp, can be avoided if you have sufficient
-space allocated for the Docker container to process the feed files internally.
+feed refresh.  This is an unfortunate but necessary evil.  The feed data will be
+dropped at /opt/shared/feed/production.
