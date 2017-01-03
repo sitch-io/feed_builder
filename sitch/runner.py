@@ -35,6 +35,8 @@ ocid_fields = ["radio", "mcc", "net", "area", "cell", "unit", "lon",
                "lat", "range", "samples", "changeable", "created",
                "updated", "averageSignal", "carrier"]
 
+feed_directory = "/var/production/"  # This is where the finished feed goes
+
 
 def compress_and_remove_original(infiles):
     for uncompressed in infiles:
@@ -48,6 +50,7 @@ def compress_and_remove_original(infiles):
 
 
 def main():
+    sitchlib.OutfileHandler.ensure_path_exists(feed_directory)
     arfcn_comparator = sitchlib.ArfcnComparator()
     config = sitchlib.ConfigHelper()
     feed_manager = sitchlib.FeedConsumer(config)
@@ -93,7 +96,7 @@ def main():
     staged_files = os.listdir(config.base_path)
     for staged_file in staged_files:
         full_src_file_name = os.path.join(config.base_path, staged_file)
-        full_dst_file_name = os.path.join("/var/production/", staged_file)
+        full_dst_file_name = os.path.join(feed_directory, staged_file)
         if (os.path.isfile(full_src_file_name)):
             shutil.copy(full_src_file_name, full_dst_file_name)
     print "ALL DONE!!!"
