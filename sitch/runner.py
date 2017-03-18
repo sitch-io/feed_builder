@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import datetime
 import gzip
 import os
 import sitchlib
@@ -47,6 +48,25 @@ def compress_and_remove_original(infiles):
         print "Written: %s" % outfile
         os.remove(infile)
         print "Removed: %s" % infile
+
+
+def get_now_string():
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    return now
+
+
+def write_statusfile(file_path):
+    datestring = get_now_string()
+    str_1 = "# SITCH Sensor Feed"
+    str_2 = "## Processed: %s" % datestring
+    str_3 = "Derived from:"
+    str_4 = "* The OpenCellID DB http://opencellid.org\n  * CGI DB\n  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/"  # NOQA
+    str_5 = "* The FCC License DB http://data.fcc.gov\n  * ARFCN DB"
+    str_6 = "* Twilio's API: https://twilio.com\n  * CGI to provider correlation"  # NOQA
+    master_str = "\n".join([str_1, str_2, str_3, str_4, str_5, str_6])
+    with open(file_path, 'w') as out_file:
+        out_file.write(master_str)
+    return
 
 
 def main():
@@ -99,6 +119,7 @@ def main():
         full_dst_file_name = os.path.join(feed_directory, staged_file)
         if (os.path.isfile(full_src_file_name)):
             shutil.copy(full_src_file_name, full_dst_file_name)
+    write_statusfile(os.path.join(config.base_path, "README.md"))
     print "ALL DONE!!!"
 
 if __name__ == "__main__":
