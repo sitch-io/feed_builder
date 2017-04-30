@@ -11,7 +11,7 @@ before_install:
 install:
 - mkdir ./sensor_feed
 script:
-- docker build -t feedbuilder
+- docker build -t feedbuilder .
 - docker run -it --rm -e OCID_KEY=$OCID_KEY -e TWILIO_SID=$TWILIO_SID -e TWILIO_TOKEN=$TWILIO_TOKEN
   -v /opt/shared/feed:./sensor_feed feedbuilder
 after_success:
