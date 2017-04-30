@@ -1,5 +1,7 @@
 language: python
 sudo: required
+services:
+-docker
 python:
 - '2.7'
 before_install:
@@ -9,8 +11,9 @@ before_install:
 install:
 - mkdir ./sensor_feed
 script:
+- docker build -t feedbuilder
 - docker run -it --rm -e OCID_KEY=$OCID_KEY -e TWILIO_SID=$TWILIO_SID -e TWILIO_TOKEN=$TWILIO_TOKEN
-  -v /opt/shared/feed:./sensor_feed docker.io/sitch/feed_builder
+  -v /opt/shared/feed:./sensor_feed feedbuilder
 after_success:
 - cd ./sensor_feed
 - mkdir ./feed
