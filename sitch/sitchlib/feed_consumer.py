@@ -59,6 +59,7 @@ class FeedConsumer(object):
         print "Converting FCC license from zip to gzip"
         with ZipFile(self.fcc_tempfile, 'r') as src_file:
             src_file.extract(self.fcc_enclosed_file, "/var/")
+        print("Extracted contents from zip...")
         os.remove(self.fcc_tempfile)
         raw_fcc_file = "/var/%s" % self.fcc_enclosed_file
         with open(raw_fcc_file, 'rb') as file_in:
