@@ -39,7 +39,7 @@ class FeedConsumer(object):
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     status += 1024
-                    if status % 1000 == 0:
+                    if status % 10000 == 0:
                         print("Downloaded %s for OpenCellID" % str(status))
                     feed_file.write(chunk)
         print "OCID feed file written to %s" % self.ocid_outfile
@@ -54,7 +54,7 @@ class FeedConsumer(object):
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     status += 1024
-                    if status % 1000 == 0:
+                    if status % 10000 == 0:
                         print("Downloaded %s for FCC Feed" % str(status))
                     feed_temp_file.write(chunk)
         print "Converting FCC license from zip to gzip"
