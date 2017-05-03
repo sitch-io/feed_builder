@@ -35,8 +35,11 @@ class FeedConsumer(object):
         response = requests.post(self.ocid_url, data=payload, stream=True)
         print "Getting OCID feed file.  This will take a while..."
         with open(self.ocid_outfile, 'wb') as feed_file:
+            status = 0
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
+                    status += 1024
+                    print("Downloaded %s for OpenCellID" % str(status))
                     feed_file.write(chunk)
         print "OCID feed file written to %s" % self.ocid_outfile
 
@@ -46,8 +49,11 @@ class FeedConsumer(object):
         response = requests.get(self.fcc_url, stream=True)
         print "Downloading FCC license database.  This will take a while."
         with open(self.fcc_tempfile, 'wb') as feed_temp_file:
+            status = 0
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
+                    status += 1024
+                    print("Downloaded %s for FCC Feed" % str(status))
                     feed_temp_file.write(chunk)
         print "Converting FCC license from zip to gzip"
         with ZipFile(self.fcc_tempfile, 'r') as src_file:
