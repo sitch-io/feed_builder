@@ -3,3 +3,5 @@
 sitch/test/.cache/
 .cache
 .coverage
+id_rsa
+id_rsa.pub

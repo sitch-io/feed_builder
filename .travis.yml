@@ -1,0 +1,34 @@
+language: python
+sudo: required
+services:
+- docker
+python:
+- '2.7'
+before_install:
+- openssl aes-256-cbc -K $encrypted_c95704a80605_key -iv $encrypted_c95704a80605_iv
+  -in id_rsa.enc -out ~/.ssh/id_rsa -d
+- chmod 600 ~/.ssh/id_rsa
+install:
+- mkdir ./sensor_feed
+script:
+- docker build -t feedbuilder .
+- docker run -it --rm -e OCID_KEY=$OCID_KEY -e TWILIO_SID=$TWILIO_SID -e TWILIO_TOKEN=$TWILIO_TOKEN
+  -v sensor_feed:/var/ feedbuilder
+after_success:
+- cd ./sensor_feed
+- mkdir ./feed
+- mv ./*gz ./feed
+- git init
+- echo "Host git.resin.io" >> ~/.ssh/config;
+- echo "    StrictHostKeyChecking no" >> ~/.ssh/config;
+- echo "    IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config;
+- git remote add git@github.com:/sitch-io/sensor_feed.git
+- git add ./README.md
+- git add ./feed/*.gz
+- git commit -m "Auto-built in travis-ci"
+- git push --force origin master
+env:
+  global:
+  - secure: fCs8BIKCtuLmHF+WjySVklwi4AvSwUeka7XbFl7Yd7F+feN3RvMkTnmOD6QjmYCdZhyLRUXe66ArCpaAtGjSrpKqujx/pGx0XhJCFUDM3OKrSbDHVfffPuLGeWCW1ofqX600lIdjx20cPmdmu7COFEaPG+O8PWgZh99BbOzlYELBlQZUjSgY0zQ3BWdmlvJVcquDK/Yz3g+dT1uUww0H2UWLwUoX76fwWDiEJpr6fjMTVfl81LwVcSxvRNJcnZd7WYSZLwklytO2sxEwCmEjEn3KFPud9HD1GsUsaoAQbw4bjJ9y3WZbxWH+tZEewkf+p0xuub2VlOIj3D0gjdMcGnvdBh6lEvvoiSD3sw/bEov6E1vc1xuxyR59hxC8LitGS3upKT2LZ0YYQ8WFfX8snBBFmnH3OEj5feChWCWQsNwRQBpjxRuVxkA01RzgzHgJ9JhoMGS2CnUTulMAcMtVHxc44lXH751JoygkPe/w9TBfiMHzuGlc9yInB/njwiTYsY6Evw5Wn310Fr1S4/3xvEjbgDzr+FmyI+/8JQSELHyr+eE5UmnO6ldjrEVPbYy3VlBRG8Wh7NJ0a25HuLaTQDxgrEBDGgI5zEdfQ5ZMTrnhARUS93cDveiRZW67JjiZtOx/b5cl3+T6FedIfFmMdj8qTqFAgWiVlA2/3K0SwB0=
+  - secure: d7vLREU5oL5ZhM4rLdXUM4sstVlLx0+iU34nZOZdOGbhrgIi5u2QpufPOhh8hMKcC9UU5YU3NCSnCDS63/BG0WsltMk1Mkwql4HZhXV4JskjKKmZYCwK7wkqF1WhGGb2u1rtcOsRMbzLe7B2bi0q7+KbIMCSP847dTXkYRMG4daeu21N0vDJVm73SFbk/8mnvVJXoUj/WAvL/X+HSUbmznHFF+NzSM3XZgJjkVrOsEV0DG0u+eNHj169NdkDrTBZPJcfEwp+Bo08ZBpUYY8hterw1EhNNnb1nUYBWqpLRad31jcAdxsw8Q5IXt3O39723+J43Z/V1gnCZOs932j/SU2xp/r3NorW2Vep3RCW3q+WfyP7PvjDD7xCkzQ5OOEaemKWDqqFVnlfFTGLr43UtAlTISLen3D2kGSj1N+DFoqPKn4ZAIRygfs5mAoochRQ/Qdpm61yKeO1i8zTSdJNuf1J7U4yxJ3oJhsFodUhpzsBqpjRYMfsgw6x6tInNwz5xH+bIgE1ufOsQTi4BZcmq4A+p23x/natdM0gO7WNak8A1kKtT/RkJd6pmOcOIoBcds74xlJuFbmno9B0TismOxUmwccNoagzfrPq3Ub6baOjNUVfxIvpLuCT0NvQxGjBEpLuRW/FaYZ+yff8ETqip4Kz8EPIEbVOMQeaszLd1Rg=
+  - secure: JoO+7ButJsaE+KwJtdTWWHCDRHys2kUpLEMJdfQyNnzzzQLPpp2GHMmDXgIxAkIQy6eGAimZ8xAVVy/QWb8OoyhNGV9dWKS4bLcIljad9PMbagZPEAQEDcQI9/3YBAcEaF30BmsT1GoZ1eqdztorHuIOBdfqfTSIFui1SUQMmO0nOxivEFLxrQNA25kdR/EX4fGXW2P2VudsCKfD7YMSAgPS0aVywLhFbxag/EPiBrwWPzQ1lGiWYZwHU7HjIXks9wLNpz3+3voX8wNCy9VAGotpGPoHPFpGxhA4Nc1MygGMlux/LfSzwoHQIWcjSnPMCmSsOZdhYyGkhiT7eQGcChS7IiVDTIRppqrX5fu8iWsEZlsVdV6UMb11mfP2GYnKSA43t7gmOqwuFXhIPa8tmRtEKxHs2+k8Eh0YJCOu92d46UV7KISGd96d/xtHFO8u3UR+eRfX3Z3JoR4HKfbC/+50R3C21je3GuUi5ITQ0fkb5I/UuIOTRuOL18bIL57xtShgkURw2qoR6pdtvrfqmGkBkALlJ6E4g8z+mTZPly2bBS7jyBhuIFxT4f7Z3bOpk6xQccBqfYieDGnKF7Fw5+eU+1B5hFHh4hZkvsGaUgBZopvPqwgT0lCzXh+5xCbroxZ/aglbakzIjWJpg9BimjUG1DWVVfsdbSo7rAoJjdo=

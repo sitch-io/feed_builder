@@ -27,6 +27,7 @@ class FeedConsumer(object):
         self.fcc_outfile = config.fcc_destination_file
         self.fcc_tempfile = "%s%s" % (self.fcc_outfile, "tempfile")
         self.fcc_enclosed_file = config.fcc_enclosed_file
+        self.chunk_size = 104857600  # 100MB
 
     def write_ocid_feed_file(self):
         """ Calling this method will cause the retrieval of the
@@ -35,8 +36,11 @@ class FeedConsumer(object):
         response = requests.post(self.ocid_url, data=payload, stream=True)
         print "Getting OCID feed file.  This will take a while..."
         with open(self.ocid_outfile, 'wb') as feed_file:
-            for chunk in response.iter_content(chunk_size=1024):
+            status = 0
+            for chunk in response.iter_content(chunk_size=self.chunk_size):
                 if chunk:
+                    status += self.chunk_size
+                    print("Downloaded %s for OpenCellID" % str(status))
                     feed_file.write(chunk)
         print "OCID feed file written to %s" % self.ocid_outfile
 
@@ -46,12 +50,16 @@ class FeedConsumer(object):
         response = requests.get(self.fcc_url, stream=True)
         print "Downloading FCC license database.  This will take a while."
         with open(self.fcc_tempfile, 'wb') as feed_temp_file:
-            for chunk in response.iter_content(chunk_size=1024):
+            status = 0
+            for chunk in response.iter_content(chunk_size=self.chunk_size):
                 if chunk:
+                    status += self.chunk_size
+                    print("Downloaded %s for FCC Feed" % str(status))
                     feed_temp_file.write(chunk)
         print "Converting FCC license from zip to gzip"
         with ZipFile(self.fcc_tempfile, 'r') as src_file:
             src_file.extract(self.fcc_enclosed_file, "/var/")
+        print("Extracted contents from zip...")
         os.remove(self.fcc_tempfile)
         raw_fcc_file = "/var/%s" % self.fcc_enclosed_file
         with open(raw_fcc_file, 'rb') as file_in:

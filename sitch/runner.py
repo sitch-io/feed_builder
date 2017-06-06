@@ -124,6 +124,8 @@ def main():
     ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
     print "Splitting OpenCellID feed into MCC files..."
     for row in ocid_feed_obj:
+        if row["radio"] != config.target_radio:
+            continue
         row["carrier"] = carrier_enricher.get_carrier(row["mcc"], row["net"])
         fileout.write_ocid_record(row)
     print "Compressing OpenCellID feed files"
