@@ -75,7 +75,7 @@ def travis_its_going_to_be_ok():
     sleep_val = 120
     sleep_total = 0
     while True:
-        print("Still running...%s" % sleep_total)
+        print("Still running...%s/3000 until job timeout!" % sleep_total)
         sleep_total += sleep_val
         time.sleep(sleep_val)
     return
