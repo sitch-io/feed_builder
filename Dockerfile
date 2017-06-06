@@ -4,6 +4,7 @@ MAINTAINER ash.d.wilson@gmail.com
 RUN apk update && apk add \
     gcc \
     linux-headers \
+    musl-dev \
     python \
     python-dev
 
@@ -11,7 +12,6 @@ ADD https://bootstrap.pypa.io/get-pip.py /
 RUN python /get-pip.py
 
 RUN pip install \
-    gcc \
     psutil \
     requests==2.13.0 \
     twilio==5.7.0
