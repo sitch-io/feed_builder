@@ -76,6 +76,7 @@ def travis_its_going_to_be_ok():
     sleep_val = 120
     sleep_total = 0
     while True:
+        print("__________________________________________")
         print("Still running...%s/3000 until job timeout!" % sleep_total)
         vmem = psutil.virtual_memory().percent
         disk = psutil.disk_usage('/').percent
@@ -83,6 +84,7 @@ def travis_its_going_to_be_ok():
         iowait = psutil.cpu_times().iowait
         print("Memory: %s\tDisk: %s\tUser: %s\tIO Wait: %s" % (vmem, disk,
                                                                cpu, iowait))
+        print("__________________________________________")
         sleep_total += sleep_val
         time.sleep(sleep_val)
     return
