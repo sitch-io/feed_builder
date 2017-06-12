@@ -84,11 +84,11 @@ class FeedConsumer(object):
         response = requests.get(self.fcc_url, stream=True)
         print "Downloading FCC license database.  This will take a while."
         with open(self.fcc_tempfile, 'wb') as feed_temp_file:
-            status = 0
+            # status = 0
             for chunk in response.iter_content(chunk_size=self.chunk_size):
                 if chunk:
-                    status += self.chunk_size
-                    print("Downloaded %s for FCC Feed" % str(status))
+                    # status += self.chunk_size
+                    # print("Downloaded %s for FCC Feed" % str(status))
                     feed_temp_file.write(chunk)
         print "Converting FCC license from zip to gzip"
         with ZipFile(self.fcc_tempfile, 'r') as src_file:
