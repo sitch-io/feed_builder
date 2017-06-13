@@ -76,9 +76,9 @@ def write_statusfile(file_path):
 def travis_its_going_to_be_ok():
     sleep_val = 120
     sleep_total = 0
-    while True:
+    while work_done is False:
         print("__________________________________________")
-        print("Still running...%s/3000 until job timeout!" % sleep_total)
+        print("Still running...%s seconds." % sleep_total)
         vmem = psutil.virtual_memory().percent
         disk = psutil.disk_usage('/').percent
         cpu = psutil.cpu_times().user
@@ -92,6 +92,8 @@ def travis_its_going_to_be_ok():
 
 
 def main():
+    global work_done
+    work_done = False
     travis_placation = threading.Thread(target=travis_its_going_to_be_ok,
                                         name="needy_travis")
     travis_placation.daemon = True
@@ -149,7 +151,8 @@ def main():
         if (os.path.isfile(full_src_file_name)):
             shutil.copy(full_src_file_name, full_dst_file_name)
     write_statusfile(os.path.join(config.base_path, "README.md"))
-    travis_placation.stop()
+    work_done = True
+    travis_placation.join()
     print "ALL DONE!!!"
 
 if __name__ == "__main__":
