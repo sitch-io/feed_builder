@@ -3,12 +3,12 @@ import os
 
 class ConfigHelper:
     def __init__(self):
-        self.ocid_key = ConfigHelper.get_from_env("OCID_KEY")
+        self.ocid_key = os.getenv("OCID_KEY")
         self.base_path = "/var/feed/"
         self.iso_country = "US"
         self.twilio_sid = ConfigHelper.get_from_env("TWILIO_SID")
         self.twilio_token = ConfigHelper.get_from_env("TWILIO_TOKEN")
-        self.ocid_destination_file = "/var/ocid.csv.gz"
+        self.ocid_base = "/var/"
         self.fcc_tempfile = "/var/fcc.tmp.zip"
         self.fcc_enclosed_file = "fcc_lic_vw.csv"
         self.fcc_destination_file = "/var/fcc.csv.gz"

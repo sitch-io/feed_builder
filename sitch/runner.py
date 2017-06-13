@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import datetime
 import gzip
+import opencellid
 import os
 import psutil
 import sitchlib
@@ -129,8 +130,9 @@ def main():
     fileout = sitchlib.OutfileHandler(config.base_path,
                                       fcc_fields, ocid_fields)
     print "Downloading feed from OpenCellID"
-    feed_manager.write_ocid_feed_file()
-    ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
+    ocid_feed_obj = opencellid.OpenCellIdFeed(config.ocid_base,
+                                              config.ocid_key)
+    ocid_feed_obj.update_feed()
     print "Splitting OpenCellID feed into MCC files..."
     for row in ocid_feed_obj:
         if row["radio"] != config.target_radio:
