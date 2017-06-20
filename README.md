@@ -41,15 +41,17 @@ the arguments for ```docker run```.  If not, you'll quickly subscribe the disk
 in your instance running the Docker engine.  This takes quite a while to run.  
 See below for details.
 
-This is how you should kick it off, and treat it like a daily cron
-job:
+You can run the feed builder process after checking out this repo by doing
+something like the following (change `/opt/shared/feed` to some Docker-writable
+output directory on your machine):
 
+    docker build --pull -t feed_builder .
     docker run -it --rm \
        -e OCID_KEY=$OCID_KEY \
        -e TWILIO_SID=$TWILIO_SID \
        -e TWILIO_TOKEN=$TWILIO_TOKEN \
        -v /opt/shared/feed:/var/ \
-       docker.io/sitch/feed_builder
+       feed_builder
 
 While the Docker image itself is a humble <64MB, the running container
 can use beyond 12.5GB of disk storage and nearly 2GB of RAM as it creates the
