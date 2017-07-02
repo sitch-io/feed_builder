@@ -1,9 +1,13 @@
 #!/usr/bin/python
 import datetime
 import gzip
+import opencellid
 import os
+import psutil
 import sitchlib
 import shutil
+import threading
+import time
 
 """ Outputs files like state.csv.gz.  These contain CSV data from the
 FCC license database.  Use for determining GPS distance from tower.  Also
@@ -69,7 +73,31 @@ def write_statusfile(file_path):
     return
 
 
+def travis_its_going_to_be_ok():
+    sleep_val = 120
+    sleep_total = 0
+    while work_done is False:
+        print("__________________________________________")
+        print("Still running...%s seconds." % sleep_total)
+        vmem = psutil.virtual_memory().percent
+        disk = psutil.disk_usage('/').percent
+        cpu = psutil.cpu_times().user
+        iowait = psutil.cpu_times().iowait
+        print("Memory: %s\tDisk: %s\tUser: %s\tIO Wait: %s" % (vmem, disk,
+                                                               cpu, iowait))
+        print("__________________________________________")
+        sleep_total += sleep_val
+        time.sleep(sleep_val)
+    return
+
+
 def main():
+    global work_done
+    work_done = False
+    travis_placation = threading.Thread(target=travis_its_going_to_be_ok,
+                                        name="needy_travis")
+    travis_placation.daemon = True
+    travis_placation.start()
     sitchlib.OutfileHandler.ensure_path_exists(feed_directory)
     arfcn_comparator = sitchlib.ArfcnComparator()
     config = sitchlib.ConfigHelper()
@@ -104,8 +132,9 @@ def main():
     fileout = sitchlib.OutfileHandler(config.base_path,
                                       fcc_fields, ocid_fields)
     print "Downloading feed from OpenCellID"
-    feed_manager.write_ocid_feed_file()
-    ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
+    ocid_feed_obj = opencellid.OpenCellIdFeed(config.ocid_base,
+                                              config.ocid_key)
+    ocid_feed_obj.update_feed()
     print "Splitting OpenCellID feed into MCC files..."
     for row in ocid_feed_obj:
         if row["radio"] != config.target_radio:
@@ -122,6 +151,8 @@ def main():
         if (os.path.isfile(full_src_file_name)):
             shutil.copy(full_src_file_name, full_dst_file_name)
     write_statusfile(os.path.join(config.base_path, "README.md"))
+    work_done = True
+    travis_placation.join()
     print "ALL DONE!!!"
 
 if __name__ == "__main__":

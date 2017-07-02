@@ -3,7 +3,7 @@ import os
 
 class ConfigHelper:
     def __init__(self):
-        self.ocid_key = ConfigHelper.get_from_env("OCID_KEY")
+        self.ocid_key = os.getenv("OCID_KEY")
         self.base_path = "/var/feed/"
         self.iso_country = "US"
         self.twilio_sid = ConfigHelper.get_from_env("TWILIO_SID")
