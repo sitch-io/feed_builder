@@ -115,7 +115,7 @@ def main():
         full_dst_file_name = os.path.join(feed_directory, staged_file)
         if (os.path.isfile(full_src_file_name)):
             shutil.copy(full_src_file_name, full_dst_file_name)
-    write_statusfile(os.path.join(config.base_path, "README.md"))
+    write_statusfile(os.path.join("/opt/", "README.md"))
     print "ALL DONE!!!"
 
 
