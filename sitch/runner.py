@@ -40,7 +40,7 @@ feed_directory = "/var/production/"  # This is where the finished feed goes
 
 
 def compress_and_remove_original(infiles):
-    for uncompressed in infiles:
+    for uncompressed in list(infiles):
         infile = uncompressed
         outfile = "%s.gz" % infile
         with open(infile, 'rb') as f_in, gzip.open(outfile, 'wb') as f_out:
@@ -95,7 +95,6 @@ def main():
             net_row["ARFCN"] = arfcn
             fileout.write_fcc_record(net_row)
     print "Compressing FCC feed files"
-    # This will need to be changed to a list when the inner part goes to a set
     compress_and_remove_original(fileout.feed_files)
     fileout = None
     fileout = sitchlib.OutfileHandler(config.base_path,
@@ -108,7 +107,6 @@ def main():
         row["carrier"] = carrier_enricher.get_carrier(row["mcc"], row["net"])
         fileout.write_ocid_record(row)
     print "Compressing OpenCellID feed files"
-    # This will need to be changed to a list when the inner part goes to a set
     compress_and_remove_original(fileout.feed_files)
     print "Moving to drop directory..."
     staged_files = os.listdir(config.base_path)
