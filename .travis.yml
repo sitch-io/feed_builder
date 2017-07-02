@@ -24,7 +24,7 @@ script:
   -e TWILIO_TOKEN=$TWILIO_TOKEN
   -v ~/sensor_feed:/opt/ feedbuilder
 after_success:
-- sudo chown -R ${USER} .
+- sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
 - echo "Host git.resin.io" >> ~/.ssh/config;
