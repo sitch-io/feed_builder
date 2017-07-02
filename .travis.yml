@@ -22,11 +22,9 @@ script:
   -e OCID_KEY=$OCID_KEY
   -e TWILIO_SID=$TWILIO_SID
   -e TWILIO_TOKEN=$TWILIO_TOKEN
-  -v sensor_feed:/opt/ feedbuilder
+  -v ~/sensor_feed:/opt/ feedbuilder
 after_success:
-- cd ./sensor_feed
-- mkdir ./feed
-- mv ./*gz ./feed
+- cd ~/sensor_feed
 - git init
 - echo "Host git.resin.io" >> ~/.ssh/config;
 - echo "    StrictHostKeyChecking no" >> ~/.ssh/config;
