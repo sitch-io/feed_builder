@@ -31,7 +31,7 @@ after_success:
 - echo "Host git.resin.io" >> ~/.ssh/config;
 - echo "    StrictHostKeyChecking no" >> ~/.ssh/config;
 - echo "    IdentityFile ~/.ssh/id_rsa" >> ~/.ssh/config;
-- git remote add git@github.com:/sitch-io/sensor_feed.git
+- git remote add oritin git@github.com:/sitch-io/sensor_feed.git
 - git add ./README.md
 - git add ./feed/*.gz
 - git commit -m "Auto-built in travis-ci"
