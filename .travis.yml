@@ -12,7 +12,14 @@ install:
 - mkdir ./sensor_feed
 script:
 - docker build -t feedbuilder .
-- docker run -it --rm -e OCID_KEY=$OCID_KEY -e TWILIO_SID=$TWILIO_SID -e TWILIO_TOKEN=$TWILIO_TOKEN
+- docker pull sitch/feed_data_ocid
+- docker pull sitch/feed_data_fcc
+- docker run -it --rm
+  --volumes_from sitch/feed_data_ocid
+  --volumes_from sitch/feed_data_fcc
+  -e OCID_KEY=$OCID_KEY
+  -e TWILIO_SID=$TWILIO_SID
+  -e TWILIO_TOKEN=$TWILIO_TOKEN
   -v sensor_feed:/var/ feedbuilder
 after_success:
 - cd ./sensor_feed
