@@ -14,9 +14,11 @@ script:
 - docker build -t feedbuilder .
 - docker pull sitch/feed_data_ocid
 - docker pull sitch/feed_data_fcc
+- docker create --name ocid_feed sitch/feed_data_ocid /bin/true
+- docker create --name fcc_feed sitch/feed_data_fcc /bin/true
 - docker run -it --rm
-  --volumes-from sitch/feed_data_ocid
-  --volumes-from sitch/feed_data_fcc
+  --volumes-from ocid_feed
+  --volumes-from fcc_feed
   -e OCID_KEY=$OCID_KEY
   -e TWILIO_SID=$TWILIO_SID
   -e TWILIO_TOKEN=$TWILIO_TOKEN
