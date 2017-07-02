@@ -17,6 +17,7 @@ script:
 - docker create --name ocid_feed sitch/feed_data_ocid /bin/true
 - docker create --name fcc_feed sitch/feed_data_fcc /bin/true
 - docker run -it --rm
+  --name feed_builder_all
   --volumes-from ocid_feed
   --volumes-from fcc_feed
   -e OCID_KEY=$OCID_KEY
@@ -24,6 +25,12 @@ script:
   -e TWILIO_TOKEN=$TWILIO_TOKEN
   -v ~/sensor_feed:/opt/ feedbuilder
 after_success:
+- docker rm feed_builder_all
+- docker rm ocid_feed
+- docker rm fcc_feed
+- docker rmi sitch/feed_data_ocid
+- docker rmi sitch/feed_data_fcc
+- docker rmi feed_builder
 - sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
