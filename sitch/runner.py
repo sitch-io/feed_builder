@@ -73,16 +73,12 @@ def main():
     sitchlib.OutfileHandler.ensure_path_exists(feed_directory)
     arfcn_comparator = sitchlib.ArfcnComparator()
     config = sitchlib.ConfigHelper()
-    # feed_manager = sitchlib.FeedConsumer(config)
     fileout = sitchlib.OutfileHandler(config.base_path,
                                       fcc_fields, ocid_fields)
-    # Getting carrier reference from Twilio
     twilio_c = sitchlib.TwilioCarriers(config.twilio_sid,
                                        config.twilio_token)
     mcc_mnc_carriers = twilio_c.get_providers_for_country(config.iso_country)
     carrier_enricher = sitchlib.CarrierEnricher(mcc_mnc_carriers)
-    # print "Downloading FCC license information"
-    # feed_manager.write_fcc_feed_file()
     fcc_feed_obj = sitchlib.FccCsv(config.fcc_destination_file)
     print "Splitting FCC license file into feed files..."
     for row in fcc_feed_obj:
@@ -99,12 +95,11 @@ def main():
             net_row["ARFCN"] = arfcn
             fileout.write_fcc_record(net_row)
     print "Compressing FCC feed files"
+    # This will need to be changed to a list when the inner part goes to a set
     compress_and_remove_original(fileout.feed_files)
     fileout = None
     fileout = sitchlib.OutfileHandler(config.base_path,
                                       fcc_fields, ocid_fields)
-    print "Downloading feed from OpenCellID"
-    # feed_manager.write_ocid_feed_file()
     ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
     print "Splitting OpenCellID feed into MCC files..."
     for row in ocid_feed_obj:
@@ -113,6 +108,7 @@ def main():
         row["carrier"] = carrier_enricher.get_carrier(row["mcc"], row["net"])
         fileout.write_ocid_record(row)
     print "Compressing OpenCellID feed files"
+    # This will need to be changed to a list when the inner part goes to a set
     compress_and_remove_original(fileout.feed_files)
     print "Moving to drop directory..."
     staged_files = os.listdir(config.base_path)

@@ -9,7 +9,7 @@ class OutfileHandler(object):
         self.ensure_path_exists(self.base_path)
         self.fcc_columns = fcc_columns
         self.ocid_columns = ocid_columns
-        self.feed_files = []
+        self.feed_files = set([])
 
     def write_fcc_record(self, data):
         dir_name = self.base_path
@@ -20,7 +20,7 @@ class OutfileHandler(object):
             self.append_feed_file(file_path, self.fcc_columns, data)
         else:
             self.start_feed_file(file_path, self.fcc_columns, data)
-            self.feed_files.append(file_path)
+            self.feed_files.add(file_path)
 
     def write_ocid_record(self, data):
         dir_name = self.base_path
@@ -31,7 +31,7 @@ class OutfileHandler(object):
             self.append_feed_file(file_path, self.ocid_columns, data)
         else:
             self.start_feed_file(file_path, self.ocid_columns, data)
-            self.feed_files.append(file_path)
+            self.feed_files.add(file_path)
 
     def start_feed_file(self, file_path, columns, data):
         print "Starting a new feed file: %s" % file_path
