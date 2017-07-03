@@ -24,13 +24,12 @@ script:
   -e TWILIO_SID=$TWILIO_SID
   -e TWILIO_TOKEN=$TWILIO_TOKEN
   -v ~/sensor_feed:/opt/ feedbuilder
-after_success:
-- docker rm feed_builder_all
 - docker rm ocid_feed
 - docker rm fcc_feed
 - docker rmi sitch/feed_data_ocid
 - docker rmi sitch/feed_data_fcc
 - docker rmi feed_builder
+- docker purge --all --force
 - sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
@@ -41,6 +40,7 @@ after_success:
 - git add ./README.md
 - git add ./feed/*.gz
 - git commit -m "Auto-built in travis-ci"
+after_success:
 - git push --force origin master
 env:
   global:
