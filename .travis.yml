@@ -38,7 +38,7 @@ script:
 - git remote add oritin git@github.com:/sitch-io/sensor_feed.git
 - git add ./README.md
 - git add ./feed/*.gz
-- git commit -m "Auto-built in travis-ci"
+- git commit -m "Auto-built in travis-ci" 2>&1 > /dev/null
 after_success:
 - git push --force origin master
 env:
