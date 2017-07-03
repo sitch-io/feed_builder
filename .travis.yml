@@ -11,7 +11,7 @@ before_install:
 install:
 - mkdir ./sensor_feed
 script:
-- docker build -t feedbuilder .
+- docker build -t feed_builder .
 - docker pull sitch/feed_data_ocid
 - docker pull sitch/feed_data_fcc
 - docker create --name ocid_feed sitch/feed_data_ocid /bin/true
@@ -29,7 +29,6 @@ script:
 - docker rmi sitch/feed_data_ocid
 - docker rmi sitch/feed_data_fcc
 - docker rmi feed_builder
-- docker purge --all --force
 - sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
