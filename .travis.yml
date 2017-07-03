@@ -23,7 +23,7 @@ script:
   -e OCID_KEY=$OCID_KEY
   -e TWILIO_SID=$TWILIO_SID
   -e TWILIO_TOKEN=$TWILIO_TOKEN
-  -v ~/sensor_feed:/opt/ feedbuilder
+  -v ~/sensor_feed:/opt/ feed_builder
 - docker rm ocid_feed
 - docker rm fcc_feed
 - docker rmi sitch/feed_data_ocid
