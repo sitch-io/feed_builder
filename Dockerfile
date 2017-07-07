@@ -1,15 +1,9 @@
-FROM alpine:3.4
-MAINTAINER ash.d.wilson@gmail.com
+FROM jamiehewland/alpine-pypy:2
 
 RUN apk update && apk add \
     gcc \
     linux-headers \
-    musl-dev \
-    python \
-    python-dev
-
-ADD https://bootstrap.pypa.io/get-pip.py /
-RUN python /get-pip.py
+    musl-dev
 
 RUN pip install \
     opencellid==1.2 \
@@ -22,4 +16,4 @@ COPY sitch/ /app/sitch
 
 WORKDIR /app/sitch
 
-CMD ["/usr/bin/python", "/app/sitch/runner.py"]
+CMD ["/usr/local/bin/pypy", "/app/sitch/runner.py"]
