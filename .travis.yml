@@ -12,6 +12,7 @@ install:
 - mkdir ./sensor_feed
 script:
 - docker build -t feed_builder_test .
+- docker rmi feed_builder_test
 - docker pull sitch/feed_builder
 - docker pull sitch/feed_data_ocid
 - docker pull sitch/feed_data_fcc
