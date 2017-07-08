@@ -13,9 +13,9 @@ install:
 script:
 - docker build -t feed_builder_test .
 - docker rmi feed_builder_test
-- docker pull sitch/feed_builder
-- docker pull sitch/feed_data_ocid
-- docker pull sitch/feed_data_fcc
+- docker pull sitch/feed_builder:latest
+- docker pull sitch/feed_data_ocid:latest
+- docker pull sitch/feed_data_fcc:latest
 - docker create --name ocid_feed sitch/feed_data_ocid /bin/true
 - docker create --name fcc_feed sitch/feed_data_fcc /bin/true
 - docker run -it --rm
@@ -25,12 +25,12 @@ script:
   -e OCID_KEY=$OCID_KEY
   -e TWILIO_SID=$TWILIO_SID
   -e TWILIO_TOKEN=$TWILIO_TOKEN
-  -v ~/sensor_feed:/opt/ sitch/feed_builder
+  -v ~/sensor_feed:/opt/ sitch/feed_builder:latest
 - docker rm ocid_feed
 - docker rm fcc_feed
 - docker rmi sitch/feed_data_ocid
 - docker rmi sitch/feed_data_fcc
-- docker rmi feed_builder
+- docker rmi feed_builder:latest
 - sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
