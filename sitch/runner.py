@@ -4,6 +4,7 @@ import gzip
 import os
 import sitchlib
 import shutil
+from dateutil.parser import parse as dt_parse
 
 """ Outputs files like state.csv.gz.  These contain CSV data from the
 FCC license database.  Use for determining GPS distance from tower.  Also
@@ -55,18 +56,29 @@ def get_now_string():
     return now
 
 
-def write_statusfile(file_path):
+def write_statusfile(file_path, fcc_date, ocid_date):
     datestring = get_now_string()
     str_1 = "# SITCH Sensor Feed"
     str_2 = "## Processed: %s" % datestring
     str_3 = "Derived from:"
-    str_4 = "* The OpenCellID DB http://opencellid.org\n  * CGI DB\n  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/"  # NOQA
-    str_5 = "* The FCC License DB http://data.fcc.gov\n  * ARFCN DB"
+    str_4 = "* The OpenCellID DB http://opencellid.org\n  * Newest record: %s\n  * CGI DB\n  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/" % epoch_to_iso8601(ocid_date)  # NOQA
+    str_5 = "* The FCC License DB http://data.fcc.gov\n  * Newest record: %s\n  * ARFCN DB" % epoch_to_iso8601(fcc_date)  # NOQA
     str_6 = "* Twilio's API: https://twilio.com\n  * CGI to provider correlation"  # NOQA
     master_str = "\n".join([str_1, str_2, str_3, str_4, str_5, str_6])
     with open(file_path, 'w') as out_file:
         out_file.write(master_str)
     return
+
+
+def epoch_to_iso8601(unix_time):
+    """Transform epoch time to ISO8601 format."""
+    cleaned = float(unix_time)
+    return datetime.datetime.utcfromtimestamp(cleaned).isoformat()
+
+
+def iso8601_to_epoch(iso_time):
+    """Transform iso time into a unix timestamp."""
+    return int((dt_parse(iso_time) - datetime(1970, 1, 1)).total_seconds())
 
 
 def main():
@@ -80,6 +92,8 @@ def main():
     mcc_mnc_carriers = twilio_c.get_providers_for_country(config.iso_country)
     carrier_enricher = sitchlib.CarrierEnricher(mcc_mnc_carriers)
     fcc_feed_obj = sitchlib.FccCsv(config.fcc_destination_file)
+    newest_ocid_record = 0
+    newest_fcc_record = 0
     print "Splitting FCC license file into feed files..."
     for row in fcc_feed_obj:
         f_min = row["FREQUENCY_ASSIGNED"]
@@ -94,6 +108,8 @@ def main():
         for arfcn in arfcns:
             net_row["ARFCN"] = arfcn
             fileout.write_fcc_record(net_row)
+        if iso8601_to_epoch(row["LAST_ACTION_DATE"]) > newest_fcc_record:
+            newest_fcc_record = iso8601_to_epoch(row["LAST_ACTION_DATE"])
     print "Compressing FCC feed files"
     compress_and_remove_original(fileout.feed_files)
     fileout = None
@@ -105,6 +121,8 @@ def main():
         if row["radio"] != config.target_radio:
             continue
         row["carrier"] = carrier_enricher.get_carrier(row["mcc"], row["net"])
+        if int(row["updated"]) > int(newest_ocid_record):
+            newest_ocid_record = int(row["updated"])
         fileout.write_ocid_record(row)
     print "Compressing OpenCellID feed files"
     compress_and_remove_original(fileout.feed_files)
