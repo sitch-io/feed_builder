@@ -28,9 +28,9 @@ script:
   -v ~/sensor_feed:/opt/ sitch/feed_builder:latest
 - docker rm ocid_feed
 - docker rm fcc_feed
-- docker rmi sitch/feed_data_ocid
-- docker rmi sitch/feed_data_fcc
-- docker rmi feed_builder:latest
+- docker rmi sitch/feed_data_ocid:latest
+- docker rmi sitch/feed_data_fcc:latest
+- docker rmi sitch/feed_builder:latest
 - sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
