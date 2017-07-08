@@ -1,9 +1,10 @@
 FROM jamiehewland/alpine-pypy:2
+MAINTAINER @ashmastaflash
 
-RUN apk update && apk add \
-    gcc \
-    linux-headers \
-    musl-dev
+# RUN apk update && apk add \
+#    gcc \
+#    linux-headers \
+#    musl-dev
 
 RUN pip install \
     opencellid==1.2 \
