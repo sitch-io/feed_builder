@@ -16,4 +16,5 @@ COPY sitch/ /app/sitch
 
 WORKDIR /app/sitch
 
-CMD ["/usr/local/bin/pypy", "/app/sitch/runner.py"]
+ENTRYPOINT ["/usr/local/bin/pypy"]
+CMD ["/app/sitch/runner.py"]
