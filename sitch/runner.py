@@ -78,7 +78,8 @@ def epoch_to_iso8601(unix_time):
 
 def iso8601_to_epoch(iso_time):
     """Transform iso time into a unix timestamp."""
-    return int((dt_parse(iso_time) - datetime(1970, 1, 1)).total_seconds())
+    return int((dt_parse(iso_time) -
+                datetime.datetime(1970, 1, 1)).total_seconds())
 
 
 def main():
