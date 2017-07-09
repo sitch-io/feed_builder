@@ -2,8 +2,12 @@ FROM jamiehewland/alpine-pypy:2
 MAINTAINER @ashmastaflash
 
 RUN apk add -U \
+    curl \
     expect \
-    tcl
+    gzip \
+    tcl \
+    unzip
+
 
 RUN pip install \
     opencellid==1.2 \
