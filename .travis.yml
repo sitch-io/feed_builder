@@ -31,6 +31,8 @@ script:
 - docker rmi sitch/feed_data_ocid:latest
 - docker rmi sitch/feed_data_fcc:latest
 - docker rmi sitch/feed_builder:latest
+- docker ps -a | grep -v ^CONTAINER | awk '{print $1}' | xargs docker rm
+- docker images | grep -v IMAGE | awk '{print $3}' | xargs docker rmi
 - sudo chown -R travis ~/*
 - cd ~/sensor_feed
 - git init
