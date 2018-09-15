@@ -23,11 +23,13 @@ COPY sitch/ /app/sitch
 
 WORKDIR /app/sitch
 
+RUN ls /app/sitch
+
 RUN /usr/local/bin/pypy -mpy.test \
     --cov=sitchlib \
     --cov-report term-missing \
     --profile \
-    /app/sitch/test
+    ./
 
 ##################
 
