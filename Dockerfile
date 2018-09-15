@@ -1,4 +1,4 @@
-FROM jamiehewland/alpine-pypy:2
+FROM jamiehewland/alpine-pypy@sha256:7520e252684f76bd393c85538e492c86e06c097da40c595e688b036e9d2ca34a
 MAINTAINER @ashmastaflash
 
 RUN apk add -U \
