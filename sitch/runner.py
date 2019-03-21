@@ -15,7 +15,7 @@ FCC license database.  Use for determining GPS distance from tower.  Also
 useful for correlating ARFCN/MCC/MNC for sanity and correct BTS ownership and
 licensing representation."""
 
-fcc_fields = ["LICENSE_ID", "SOURCE_SYSTEM", "CALLSIGN", "FACILITY_ID", "FRN",
+FCC_FIELDS = ["LICENSE_ID", "SOURCE_SYSTEM", "CALLSIGN", "FACILITY_ID", "FRN",
               "LIC_NAME", "COMMON_NAME", "RADIO_SERVICE_CODE",
               "RADIO_SERVICE_DESC", "ROLLUP_CATEGORY_CODE",
               "ROLLUP_CATEGORY_DESC", "GRANT_DATE", "EXPIRED_DATE",
@@ -37,11 +37,11 @@ fcc_fields = ["LICENSE_ID", "SOURCE_SYSTEM", "CALLSIGN", "FACILITY_ID", "FRN",
               "FREQUENCY_ASSIGNED", "FREQUENCY_UPPER_BAND", "UNIT_OF_MEASURE",
               "GROUND_ELEVATION", "ARFCN"]
 
-ocid_fields = ["radio", "mcc", "net", "area", "cell", "unit", "lon",
+OCID_FIELDS = ["radio", "mcc", "net", "area", "cell", "unit", "lon",
                "lat", "range", "samples", "changeable", "created",
                "updated", "averageSignal", "carrier"]
 
-feed_directory = "/var/production/"  # This is where the finished feed goes
+FEED_DIRECTORY = "/var/production/"  # This is where the finished feed goes
 
 
 def compress_and_remove_original(infiles):
@@ -65,16 +65,22 @@ def get_now_string():
 def write_statusfile(file_path, fcc_date, ocid_date):
     """Write status to file."""
     datestring = get_now_string()
-    str_1 = "# SITCH Sensor Feed"
-    str_2 = "## Processed: %s" % datestring
-    str_3 = "Derived from:"
-    str_4 = "* The OpenCellID DB http://opencellid.org\n  * Newest record: %s\n  * CGI DB\n  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/" % epoch_to_iso8601(ocid_date)  # NOQA
-    str_5 = "* The FCC License DB http://data.fcc.gov\n  * Newest record: %s\n  * ARFCN DB" % epoch_to_iso8601(fcc_date)  # NOQA
-    str_6 = "* Twilio's API: https://twilio.com\n  * CGI to provider correlation"  # NOQA
-    master_str = "\n".join([str_1, str_2, str_3, str_4, str_5, str_6])
+    body = []
+    body.append("# SITCH Sensor Feed\n")
+    body.append("## Processed: {}\n".format(datestring))
+    body.append("Derived from:\n")
+    body.append("* The OpenCellID DB http://opencellid.org")
+    body.append("  * Newest record: {}".format(epoch_to_iso8601(ocid_date)))
+    body.append("  * CGI DB")
+    body.append("  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/")  # NOQA
+    body.append("* The FCC License DB http://data.fcc.gov")
+    body.append("  * Newest record: {}".format(epoch_to_iso8601(fcc_date)))
+    body.append("  * ARFCN DB")
+    body.append("* Twilio's API: https://twilio.com")
+    body.append("  * CGI to provider correlation")
+    master_str = "\n".join(body)
     with open(file_path, 'w') as out_file:
         out_file.write(master_str)
-    return
 
 
 def epoch_to_iso8601(unix_time):
@@ -89,26 +95,18 @@ def iso8601_to_epoch(iso_time):
                 datetime.datetime(1970, 1, 1)).total_seconds())
 
 
-def main():
-    sitchlib.OutfileHandler.ensure_path_exists(feed_directory)
+def process_fcc_feed(base_path, fcc_destination_file):
+    """Process FCC feed, return newest record timestamp."""
+    fcc_feed_obj = sitchlib.FccCsv(fcc_destination_file)
     arfcn_comparator = sitchlib.ArfcnComparator()
-    config = sitchlib.ConfigHelper()
-    fileout = sitchlib.OutfileHandler(config.base_path,
-                                      fcc_fields, ocid_fields)
-    twilio_c = sitchlib.TwilioCarriers(config.twilio_sid,
-                                       config.twilio_token)
-    mcc_mnc_carriers = twilio_c.get_providers_for_country(config.iso_country)
-    carrier_enricher = sitchlib.CarrierEnricher(mcc_mnc_carriers)
-    fcc_feed_obj = sitchlib.FccCsv(config.fcc_destination_file)
-    newest_ocid_record = 0
+    fileout = sitchlib.OutfileHandler(base_path, FCC_FIELDS, OCID_FIELDS)
     newest_fcc_record = 0
-    print("Splitting FCC license file into feed files...")
     for row in fcc_feed_obj:
         f_min = row["FREQUENCY_ASSIGNED"]
         f_max = row["FREQUENCY_UPPER_BAND"]
         arfcns = arfcn_comparator.arfcn_from_downlink_range(f_min, f_max)
         net_row = {}
-        for column in fcc_fields:
+        for column in FCC_FIELDS:
             try:
                 net_row[column] = row[column]
             except KeyError:
@@ -120,9 +118,23 @@ def main():
             newest_fcc_record = iso8601_to_epoch(row["LAST_ACTION_DATE"])
     print("Compressing FCC feed files")
     compress_and_remove_original(fileout.feed_files)
-    fileout = None
+    return newest_fcc_record
+
+
+def main():
+    """Wrap all top-level logic."""
+    sitchlib.OutfileHandler.ensure_path_exists(FEED_DIRECTORY)
+    config = sitchlib.ConfigHelper()
+    twilio_c = sitchlib.TwilioCarriers(config.twilio_sid,
+                                       config.twilio_token)
+    mcc_mnc_carriers = twilio_c.get_providers_for_country(config.iso_country)
+    carrier_enricher = sitchlib.CarrierEnricher(mcc_mnc_carriers)
+    newest_ocid_record = 0
+    print("Splitting FCC license file into feed files...")
+    newest_fcc_record = process_fcc_feed(config.base_path,
+                                         config.fcc_destination_file)
     fileout = sitchlib.OutfileHandler(config.base_path,
-                                      fcc_fields, ocid_fields)
+                                      FCC_FIELDS, OCID_FIELDS)
     ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
     print("Splitting OpenCellID feed into MCC files...")
     for row in ocid_feed_obj:
@@ -138,8 +150,8 @@ def main():
     staged_files = os.listdir(config.base_path)
     for staged_file in staged_files:
         full_src_file_name = os.path.join(config.base_path, staged_file)
-        full_dst_file_name = os.path.join(feed_directory, staged_file)
-        if (os.path.isfile(full_src_file_name)):
+        full_dst_file_name = os.path.join(FEED_DIRECTORY, staged_file)
+        if os.path.isfile(full_src_file_name):
             shutil.copy(full_src_file_name, full_dst_file_name)
     write_statusfile("/opt/README.md", newest_fcc_record, newest_ocid_record)
     print("ALL DONE!!!")
