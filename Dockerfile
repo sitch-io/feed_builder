@@ -8,15 +8,9 @@ RUN apk add -U \
     tcl \
     unzip
 
-RUN pip install \
-    opencellid==1.2 \
-    psutil \
-    python-dateutil==2.6.0 \
-    pytest \
-    pytest-cov \
-    pytest-profiling \
-    requests==2.13.0 \
-    twilio==5.7.0
+COPY requirements* /
+
+RUN pip install -r requirements-test.txt
 
 COPY sitch/ /app/sitch
 
@@ -43,13 +37,9 @@ RUN apk add -U \
     tcl \
     unzip
 
+COPY requirements* /
 
-RUN pip install \
-    opencellid==1.2 \
-    psutil \
-    python-dateutil==2.6.0 \
-    requests==2.13.0 \
-    twilio==5.7.0
+RUN pip install -r requirements.txt
 
 COPY sitch/ /app/sitch
 
