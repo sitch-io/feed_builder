@@ -1,12 +1,9 @@
-import imp
+import sitchlib
 import os
 
-modulename = 'sitchlib'
 this_file_dirpath = os.path.dirname(os.path.abspath(__file__))
 project_basepath = os.path.join(this_file_dirpath, "../../")
 fixtures_path = os.path.join(this_file_dirpath, "../fixtures/")
-file, pathname, description = imp.find_module(modulename, [project_basepath])
-sitchlib = imp.load_module(modulename, file, pathname, description)
 
 
 class TestArfcnComparator:
@@ -16,8 +13,8 @@ class TestArfcnComparator:
 
     def test_comparator_match(self):
         reference = {120.00000001: 999,
-                     124.99999999991: 001,
-                     788.000000000001: 002,
+                     124.99999999991: 1,
+                     788.000000000001: 2,
                      790: 998}
         start = 123.456
         end = 789.10
@@ -28,8 +25,8 @@ class TestArfcnComparator:
 
     def test_comparator_no_match(self):
         reference = {120.00000001: 999,
-                     124.99999999991: 001,
-                     788.000000000001: 002,
+                     124.99999999991: 1,
+                     788.000000000001: 2,
                      790: 998}
         start = 1
         end = 2

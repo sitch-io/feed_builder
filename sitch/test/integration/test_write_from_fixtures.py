@@ -1,4 +1,4 @@
-import imp
+import sitchlib
 import os
 from random import choice
 from string import ascii_uppercase
@@ -6,12 +6,9 @@ from string import ascii_uppercase
 run_id = (''.join(choice(ascii_uppercase) for i in range(8)))
 temp_path = "/tmp/sitch_integration/%s" % run_id
 
-modulename = 'sitchlib'
 this_file_dirpath = os.path.dirname(os.path.abspath(__file__))
 project_basepath = os.path.join(this_file_dirpath, "../../")
 fixtures_path = os.path.join(this_file_dirpath, "../fixtures/")
-file, pathname, description = imp.find_module(modulename, [project_basepath])
-sitchlib = imp.load_module(modulename, file, pathname, description)
 csv_fixture_file = os.path.join(fixtures_path, "testdata.csv.gz")
 
 fcc_fields = ["LICENSE_ID", "SOURCE_SYSTEM", "CALLSIGN", "FACILITY_ID", "FRN",
