@@ -43,12 +43,12 @@ feed_directory = "/var/production/"  # This is where the finished feed goes
 def compress_and_remove_original(infiles):
     for uncompressed in list(infiles):
         infile = uncompressed
-        outfile = "%s.gz" % infile
+        outfile = "{}.gz".format(infile)
         with open(infile, 'rb') as f_in, gzip.open(outfile, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
-        print "Written: %s" % outfile
+        print("Written: {}".format(outfile))
         os.remove(infile)
-        print "Removed: %s" % infile
+        print("Removed: {}".format(infile))
 
 
 def get_now_string():
@@ -59,10 +59,10 @@ def get_now_string():
 def write_statusfile(file_path, fcc_date, ocid_date):
     datestring = get_now_string()
     str_1 = "# SITCH Sensor Feed"
-    str_2 = "## Processed: %s" % datestring
+    str_2 = "## Processed: {}".format(datestring)
     str_3 = "Derived from:"
-    str_4 = "* The OpenCellID DB http://opencellid.org\n  * Newest record: %s\n  * CGI DB\n  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/" % epoch_to_iso8601(ocid_date)  # NOQA
-    str_5 = "* The FCC License DB http://data.fcc.gov\n  * Newest record: %s\n  * ARFCN DB" % epoch_to_iso8601(fcc_date)  # NOQA
+    str_4 = "* The OpenCellID DB http://opencellid.org\n  * Newest record: {}\n  * CGI DB\n  * CC by SA 3.0 https://creativecommons.org/licenses/by-sa/3.0/".format(epoch_to_iso8601(ocid_date))  # NOQA
+    str_5 = "* The FCC License DB http://data.fcc.gov\n  * Newest record: {}\n  * ARFCN DB".format(epoch_to_iso8601(fcc_date))  # NOQA
     str_6 = "* Twilio's API: https://twilio.com\n  * CGI to provider correlation"  # NOQA
     master_str = "\n".join([str_1, str_2, str_3, str_4, str_5, str_6])
     with open(file_path, 'w') as out_file:
@@ -95,7 +95,7 @@ def main():
     fcc_feed_obj = sitchlib.FccCsv(config.fcc_destination_file)
     newest_ocid_record = 0
     newest_fcc_record = 0
-    print "Splitting FCC license file into feed files..."
+    print("Splitting FCC license file into feed files...")
     for row in fcc_feed_obj:
         f_min = row["FREQUENCY_ASSIGNED"]
         f_max = row["FREQUENCY_UPPER_BAND"]
@@ -111,13 +111,13 @@ def main():
             fileout.write_fcc_record(net_row)
         if iso8601_to_epoch(row["LAST_ACTION_DATE"]) > newest_fcc_record:
             newest_fcc_record = iso8601_to_epoch(row["LAST_ACTION_DATE"])
-    print "Compressing FCC feed files"
+    print("Compressing FCC feed files")
     compress_and_remove_original(fileout.feed_files)
     fileout = None
     fileout = sitchlib.OutfileHandler(config.base_path,
                                       fcc_fields, ocid_fields)
     ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
-    print "Splitting OpenCellID feed into MCC files..."
+    print("Splitting OpenCellID feed into MCC files...")
     for row in ocid_feed_obj:
         if row["radio"] != config.target_radio:
             continue
@@ -125,17 +125,17 @@ def main():
         if int(row["updated"]) > int(newest_ocid_record):
             newest_ocid_record = int(row["updated"])
         fileout.write_ocid_record(row)
-    print "Compressing OpenCellID feed files"
+    print("Compressing OpenCellID feed files")
     compress_and_remove_original(fileout.feed_files)
-    print "Moving to drop directory..."
+    print("Moving to drop directory...")
     staged_files = os.listdir(config.base_path)
     for staged_file in staged_files:
         full_src_file_name = os.path.join(config.base_path, staged_file)
         full_dst_file_name = os.path.join(feed_directory, staged_file)
-        if (os.path.isfile(full_src_file_name)):
+        if os.path.isfile(full_src_file_name):
             shutil.copy(full_src_file_name, full_dst_file_name)
     write_statusfile("/opt/README.md", newest_fcc_record, newest_ocid_record)
-    print "ALL DONE!!!"
+    print("ALL DONE!!!")
 
 
 if __name__ == "__main__":
