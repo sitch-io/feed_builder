@@ -34,7 +34,7 @@ class OutfileHandler(object):
             self.feed_files.add(file_path)
 
     def start_feed_file(self, file_path, columns, data):
-        print "Starting a new feed file: %s" % file_path
+        print("Starting a new feed file: %s" % file_path)
         with open(file_path, 'w') as outfile:
             producer = csv.DictWriter(outfile, fieldnames=columns)
             producer.writeheader()
@@ -46,10 +46,10 @@ class OutfileHandler(object):
             producer = csv.DictWriter(outfile, fieldnames=columns)
             try:
                 producer.writerow(data)
-            except ValueError as e:
-                print "ValueError!"
-                print repr(e)
-                print str(data)
+            except ValueError as err:
+                print("ValueError!")
+                print(repr(err))
+                print(str(data))
         return
 
     @classmethod

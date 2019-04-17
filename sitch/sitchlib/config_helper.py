@@ -1,3 +1,4 @@
+"""Manage configuration."""
 import os
 
 
@@ -17,7 +18,7 @@ class ConfigHelper:
     def get_from_env(cls, k):
         retval = os.getenv(k)
         if retval is None:
-            print "Required config variable not set: %s" % k
-            print "Unable to continue.  Exiting."
+            print("Required config variable not set: {}".format(k))
+            print("Unable to continue.  Exiting.")
             raise KeyError
         return retval

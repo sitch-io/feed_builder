@@ -48,12 +48,12 @@ def compress_and_remove_original(infiles):
     """Compress files, remove originals."""
     for uncompressed in list(infiles):
         infile = uncompressed
-        outfile = "%s.gz" % infile
+        outfile = "{}.gz".format(infile)
         with open(infile, 'rb') as f_in, gzip.open(outfile, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
-        print("Written: %s" % outfile)
+        print("Written: {}".format(outfile))
         os.remove(infile)
-        print("Removed: %s" % infile)
+        print("Removed: {}".format(infile))
 
 
 def get_now_string():
@@ -101,6 +101,7 @@ def process_fcc_feed(base_path, fcc_destination_file):
     arfcn_comparator = sitchlib.ArfcnComparator()
     fileout = sitchlib.OutfileHandler(base_path, FCC_FIELDS, OCID_FIELDS)
     newest_fcc_record = 0
+    print("Splitting FCC license file into feed files...")
     for row in fcc_feed_obj:
         f_min = row["FREQUENCY_ASSIGNED"]
         f_max = row["FREQUENCY_UPPER_BAND"]

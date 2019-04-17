@@ -1,7 +1,6 @@
-FROM jamiehewland/alpine-pypy@sha256:7520e252684f76bd393c85538e492c86e06c097da40c595e688b036e9d2ca34a as TESTER
-MAINTAINER @ashmastaflash
+FROM pypy:3.6 as TESTER
 
-RUN apk add -U \
+RUN apt-get update && apt-get install -y \
     curl \
     expect \
     gzip \
@@ -10,16 +9,15 @@ RUN apk add -U \
 
 COPY requirements* /
 
-RUN pip install -r requirements-test.txt
+RUN pip install --no-cache-dir -r requirements-test.txt
 
 COPY sitch/ /app/sitch
-
 
 WORKDIR /app/sitch
 
 RUN ls /app/sitch
 
-RUN /usr/local/bin/pypy -mpy.test \
+RUN pypy3 -m pytest \
     --cov=sitchlib \
     --cov-report term-missing \
     --profile \
@@ -27,10 +25,9 @@ RUN /usr/local/bin/pypy -mpy.test \
 
 ##################
 
-FROM jamiehewland/alpine-pypy@sha256:7520e252684f76bd393c85538e492c86e06c097da40c595e688b036e9d2ca34a
-MAINTAINER @ashmastaflash
+FROM pypy:3.6
 
-RUN apk add -U \
+RUN apt-get update && apt-get install -y \
     curl \
     expect \
     gzip \
@@ -39,12 +36,11 @@ RUN apk add -U \
 
 COPY requirements* /
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY sitch/ /app/sitch
 
-
 WORKDIR /app/sitch
 
-ENTRYPOINT ["/usr/local/bin/pypy"]
+ENTRYPOINT ["pypy3"]
 CMD ["/app/sitch/runner.py"]

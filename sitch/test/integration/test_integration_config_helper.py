@@ -1,13 +1,10 @@
 import pytest
-import imp
+import sitchlib
 import os
 
-modulename = 'sitchlib'
 this_file_dirpath = os.path.dirname(os.path.abspath(__file__))
 project_basepath = os.path.join(this_file_dirpath, "../../")
 fixtures_path = os.path.join(this_file_dirpath, "../fixtures/")
-file, pathname, description = imp.find_module(modulename, [project_basepath])
-sitchlib = imp.load_module(modulename, file, pathname, description)
 csv_fixture_file = os.path.join(fixtures_path, "testdata.csv.gz")
 
 

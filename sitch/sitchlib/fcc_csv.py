@@ -51,14 +51,14 @@ class FccCsv(object):
 
 
     def __iter__(self):
-        with gzip.open(self.csv_gzfile) as gz_feed:
+        with gzip.open(self.csv_gzfile, 'rt') as gz_feed:
             feed = csv.DictReader(gz_feed, fieldnames=self.fields)
             for row in feed:
                 if row["RADIO_SERVICE_CODE"] in self.radio_service_code:
                     yield row
 
     def get_fields(self):
-        with gzip.open(self.csv_gzfile) as gz_feed:
+        with gzip.open(self.csv_gzfile, 'rt') as gz_feed:
             topline = gz_feed.readline()
             fields = self.get_fields_from_topline(topline)
             return fields
