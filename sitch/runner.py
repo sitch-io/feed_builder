@@ -136,6 +136,7 @@ def main():
                                          config.fcc_destination_file)
     fileout = sitchlib.OutfileHandler(config.base_path,
                                       FCC_FIELDS, OCID_FIELDS)
+    print("Setup OpenCellID feed from {}".format(config.ocid_destination_file))
     ocid_feed_obj = sitchlib.OcidCsv(config.ocid_destination_file)
     print("Splitting OpenCellID feed into MCC files...")
     for row in ocid_feed_obj:
