@@ -12,7 +12,7 @@ class OcidCsv:
 
     def __iter__(self):
         """Iterate over rows in CSV."""
-        with gzip.open(self.data_bundle, 'r') as bolus:
+        with gzip.open(self.data_bundle, 'rt') as bolus:
             consumer = csv.DictReader(bolus)
             for row in consumer:
                 yield row
@@ -20,7 +20,7 @@ class OcidCsv:
     def get_mcc_list(self):
         """Return list of all MCCs from CSV."""
         mcc_list = []
-        with gzip.open(self.data_bundle, 'r') as bolus:
+        with gzip.open(self.data_bundle, 'rt') as bolus:
             consumer = csv.DictReader(bolus)
             for row in consumer:
                 if row["mcc"] not in mcc_list:
@@ -30,7 +30,7 @@ class OcidCsv:
     def get_all_for_mcc(self, radio, mcc):
         """Return all rows for radio, MCC."""
         results = []
-        with gzip.open(self.data_bundle, 'r') as bolus:
+        with gzip.open(self.data_bundle, 'rt') as bolus:
             consumer = csv.DictReader(bolus)
             for row in consumer:
                 if (row["mcc"] == mcc and row["radio"] == radio):
